@@ -5,22 +5,40 @@ trigger:
 pool:
    vmImage: 'ubuntu-latest'
 
-steps: 
-- task: GoTool@0
-  inputs:
-    version: '1.13.5'
-- task: Go@0
-  inputs:
-    command: 'get'
-    arguments: '-d'
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
-- task: Go@0
-  inputs:
-    command: 'build'
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
-- task: CopyFiles@2
-  inputs:
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-- task: PublishBuildArtifacts@1
-  inputs:
-     artifactName: drop
+variables:
+  GO_VERSION: 1.14.3
+  GOOS: windows
+
+stages:
+- stage: build  
+  jobs:
+  - job: build_executable
+    steps: 
+    - task: GoTool@0
+      displayName: go $(GO_VERSION)
+      inputs:
+        version: $(GO_VERSION)
+    - task: Go@0
+      displayName: go build
+      inputs:
+        command: 'build'
+        arguments: '-o "$(Build.ArtifactStagingDirectory)/loki.exe" ./cmd/loki'
+        workingDirectory: '$(Build.SourcesDirectory)'
+
+    - publish: $(Build.ArtifactStagingDirectory)
+      artifact: build
+
+- stage: deploy
+  jobs:
+  - deployment: deploy_executable
+    environment: Test
+    pool:
+      name: Default
+      demands: Agent.Name -equals DK-BUI01
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - powershell: Stop-Service loki
+          - powershell: Copy-Item $(Pipeline.Workspace)/build/loki.exe C:/loki/loki-windows-amd64.exe
+          - powershell: Start-Service loki
