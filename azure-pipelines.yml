@@ -9,18 +9,34 @@ variables:
   GO_VERSION: 1.14.3
   GOOS: windows
 
-steps: 
-- task: GoTool@0
-  displayName: go $(GO_VERSION)
-  inputs:
-    version: $(GO_VERSION)
+stages:
+- stage: build  
+  jobs:
+  - job: build_executable
+    steps: 
+    - task: GoTool@0
+      displayName: go $(GO_VERSION)
+      inputs:
+        version: $(GO_VERSION)
+    - task: Go@0
+      displayName: go build
+      inputs:
+        command: 'build'
+        arguments: '-o "$(Build.ArtifactStagingDirectory)/loki.exe" ./cmd/loki'
+        workingDirectory: '$(Build.SourcesDirectory)'
 
-- task: Go@0
-  displayName: go build
-  inputs:
-    command: 'build'
-    arguments: '-o "$(Build.ArtifactStagingDirectory)/loki.exe" ./cmd/loki'
-    workingDirectory: '$(Build.SourcesDirectory)'
+    - publish: $(Build.ArtifactStagingDirectory)
+      artifact: build
 
-- publish: $(Build.ArtifactStagingDirectory)
-  artifact: build
+- stage: deploy
+  jobs:
+  - deployment: deploy_executable
+    environment: Test
+    pool:
+      name: Default
+      demands: Agent.Name -equals DK-BUI01
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - powershell: echo 'hello world'
