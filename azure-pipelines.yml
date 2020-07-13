@@ -5,23 +5,30 @@ trigger:
 pool:
    vmImage: 'ubuntu-latest'
 
+variables:
+  GO_VERSION: 1.14.3
+
 steps: 
 - task: GoTool@0
+  displayName: go $(GO_VERSION)
   inputs:
-    version: '1.14.3'
+    version: $(GO_VERSION)
 # - task: Go@0
 #   inputs:
 #     command: 'get'
 #     arguments: '-d'
 #     workingDirectory: '$(System.DefaultWorkingDirectory)'
 
-- script: go env
 
 - task: Go@0
+  displayName: go build
   inputs:
     command: 'build'
-    arguments: './cmd/loki'
+    arguments: './cmd/loki -o $(Build.ArtifactStagingDirectory)/loki.exe'
     workingDirectory: '$(Build.SourcesDirectory)'
+
+- publish: $(Build.ArtifactStagingDirectory)
+  artifact: build
 
 # - task: CopyFiles@2
 #   inputs:
