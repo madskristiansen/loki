@@ -7,7 +7,7 @@ pool:
 
 variables:
   GO_VERSION: 1.14.3
-  GOOS: winddows
+  GOOS: windows
 
 steps: 
 - task: GoTool@0
