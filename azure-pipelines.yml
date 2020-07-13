@@ -40,5 +40,5 @@ stages:
         deploy:
           steps:
           - powershell: Stop-Service loki
-          - powershell: Copy-Item $(Pipeline.Workspace)/build/loki.exe
+          - powershell: Copy-Item $(Pipeline.Workspace)/build/loki.exe C:/loki/loki-windows-amd64.exe
           - powershell: Start-Service loki
