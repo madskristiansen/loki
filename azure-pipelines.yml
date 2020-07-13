@@ -14,11 +14,15 @@ steps:
 #     command: 'get'
 #     arguments: '-d'
 #     workingDirectory: '$(System.DefaultWorkingDirectory)'
+
+- script: go env
+
 - task: Go@0
   inputs:
     command: 'build'
     arguments: 'cmd/loki'
     workingDirectory: '$(Build.SourcesDirectory)'
+
 # - task: CopyFiles@2
 #   inputs:
 #     TargetFolder: '$(Build.ArtifactStagingDirectory)'
