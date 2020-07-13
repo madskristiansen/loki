@@ -7,6 +7,7 @@ pool:
 
 variables:
   GO_VERSION: 1.14.3
+  GOOS: winddows
 
 steps: 
 - task: GoTool@0
@@ -18,7 +19,7 @@ steps:
   displayName: go build
   inputs:
     command: 'build'
-    arguments: './cmd/loki -o "$(Build.ArtifactStagingDirectory)/loki.exe"'
+    arguments: '-o "$(Build.ArtifactStagingDirectory)/loki.exe" ./cmd/loki'
     workingDirectory: '$(Build.SourcesDirectory)'
 
 - publish: $(Build.ArtifactStagingDirectory)
