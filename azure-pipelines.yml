@@ -13,26 +13,13 @@ steps:
   displayName: go $(GO_VERSION)
   inputs:
     version: $(GO_VERSION)
-# - task: Go@0
-#   inputs:
-#     command: 'get'
-#     arguments: '-d'
-#     workingDirectory: '$(System.DefaultWorkingDirectory)'
-
 
 - task: Go@0
   displayName: go build
   inputs:
     command: 'build'
-    arguments: './cmd/loki -o $(Build.ArtifactStagingDirectory)/loki.exe'
+    arguments: './cmd/loki -o "$(Build.ArtifactStagingDirectory)/loki.exe"'
     workingDirectory: '$(Build.SourcesDirectory)'
 
 - publish: $(Build.ArtifactStagingDirectory)
   artifact: build
-
-# - task: CopyFiles@2
-#   inputs:
-#     TargetFolder: '$(Build.ArtifactStagingDirectory)'
-# - task: PublishBuildArtifacts@1
-#   inputs:
-#      artifactName: drop
