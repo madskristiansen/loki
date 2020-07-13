@@ -39,4 +39,6 @@ stages:
       runOnce:
         deploy:
           steps:
-          - powershell: echo 'hello world'
+          - powershell: Stop-Service loki
+          - powershell: Copy-Item $(Pipeline.Workspace)/build/loki.exe
+          - powershell: Start-Service loki
